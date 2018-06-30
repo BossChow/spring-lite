@@ -1,6 +1,8 @@
 package life.kian.litespring;
 
 import life.kian.litespring.beans.BeanDefinition;
+import life.kian.litespring.beans.factory.BeanCreationException;
+import life.kian.litespring.beans.factory.BeanDefinitionStoreException;
 import life.kian.litespring.beans.factory.BeanFactory;
 import life.kian.litespring.beans.factory.support.DefaultBeanFactory;
 import life.kian.litespring.service.PetStoreService;
@@ -19,5 +21,16 @@ public class BeanFactoryTest {
 
         PetStoreService petStoreService = (PetStoreService) beanFactory.getBean("petStore");
         assertNotNull(petStoreService);
+    }
+
+    @Test(expected = BeanCreationException.class)
+    public void testInvalidBean() {
+        BeanFactory beanFactory = new DefaultBeanFactory("petstore-V1.xml");
+        beanFactory.getBean("invalidBean");
+    }
+
+    @Test(expected = BeanDefinitionStoreException.class)
+    public void testInvalidXml() {
+        new DefaultBeanFactory("petstore.xml");
     }
 }

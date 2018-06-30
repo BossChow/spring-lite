@@ -7,4 +7,5 @@
     <bean id="petStore"
           class="life.kian.litespring.service.PetStoreService" >
     </bean>
+
 </beans>

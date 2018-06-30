@@ -1,6 +1,9 @@
 package life.kian.litespring.beans.factory.support;
 
 import life.kian.litespring.beans.BeanDefinition;
+import life.kian.litespring.beans.BeansException;
+import life.kian.litespring.beans.factory.BeanCreationException;
+import life.kian.litespring.beans.factory.BeanDefinitionStoreException;
 import life.kian.litespring.beans.factory.BeanFactory;
 import life.kian.litespring.util.ClassUtils;
 import org.dom4j.Document;
@@ -34,24 +37,16 @@ public class DefaultBeanFactory implements BeanFactory {
     public Object getBean(String beanID) {
         BeanDefinition bd = this.getBeanDefinition(beanID);
         if(bd == null){
-            return null;
+            throw new BeanCreationException("Bean Definition does not exist");
         }
         ClassLoader cl = ClassUtils.getDefaultClassLoader();
         String beanClassName = bd.getBeanClassName();
         try {
             Class<?> clz = cl.loadClass(beanClassName);
             return clz.newInstance();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new BeanCreationException("create bean for "+ beanClassName +" failed", e);
         }
-
-        return null;
     }
 
     private void loadBeanDefinition(String configFile) {
@@ -73,8 +68,7 @@ public class DefaultBeanFactory implements BeanFactory {
                 this.beanDefinitionMap.put(id, bd);
             }
         } catch (DocumentException e) {
-            //TODO 抛出异常
-            e.printStackTrace();
+            throw new BeanDefinitionStoreException("IOException parsing XML document from " + configFile,e);
         }finally{
             if(is != null){
                 try {
