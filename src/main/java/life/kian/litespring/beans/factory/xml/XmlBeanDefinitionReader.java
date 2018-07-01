@@ -4,6 +4,7 @@ import life.kian.litespring.beans.BeanDefinition;
 import life.kian.litespring.beans.factory.BeanDefinitionStoreException;
 import life.kian.litespring.beans.factory.support.BeanDefinitionRegistry;
 import life.kian.litespring.beans.factory.support.GenericBeanDefinition;
+import life.kian.litespring.core.io.Resource;
 import life.kian.litespring.util.ClassUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -24,11 +25,10 @@ public class XmlBeanDefinitionReader {
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry){
         this.registry = registry;
     }
-    public void loadBeanDefinitions(String configFile){
+    public void loadBeanDefinitions(Resource resource){
         InputStream is = null;
         try{
-            ClassLoader cl = ClassUtils.getDefaultClassLoader();
-            is = cl.getResourceAsStream(configFile);
+            is = resource.getInputStream();
             SAXReader reader = new SAXReader();
             Document doc = reader.read(is);
 
@@ -41,8 +41,8 @@ public class XmlBeanDefinitionReader {
                 BeanDefinition bd = new GenericBeanDefinition(id,beanClassName);
                 this.registry.registerBeanDefinition(id, bd);
             }
-        } catch (DocumentException e) {
-            throw new BeanDefinitionStoreException("IOException parsing XML document from " + configFile,e);
+        } catch (Exception e) {
+            throw new BeanDefinitionStoreException("Exception parsing XML document from " + resource.getDescription(), e);
         }finally{
             if(is != null){
                 try {
